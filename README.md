@@ -1,66 +1,142 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Exam Portal - Online Examination and Student Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive Laravel 11 application for managing online examinations and student management with role-based access control.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Core Features
+- **Role-Based Access Control**: Two main roles - Lecturer and Student
+- **Authentication**: Secure login system with role-based redirection
+- **Exam Management**: Lecturers can create and manage exams with multiple-choice and open-text questions
+- **Class Management**: Students are organized into classes
+- **Subject Management**: Each class can have multiple subjects
+- **Access Control**: Students can only access exams assigned to their class
+- **Time Management**: Exams have configurable time limits and scheduling
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Lecturer Features
+- Create, edit, and delete exams
+- View exam statistics and dashboard
+- Manage subjects
+- View all exams created
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Student Features
+- View upcoming exams assigned to their class
+- View exam details and instructions
+- Dashboard with exam overview
 
-## Learning Laravel
+## Technical Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Framework**: Laravel 11
+- **Authentication**: Laravel Breeze
+- **Frontend**: Blade Templates with Tailwind CSS
+- **Database**: MySQL
+- **PHP Version**: 8.2+
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/yp-exam-portal.git
+cd yp-exam-portal
+```
 
-## Laravel Sponsors
+2. Install dependencies
+```bash
+composer install
+npm install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3. Configure environment
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-### Premium Partners
+4. Update `.env` with your database credentials
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+5. Run migrations
+```bash
+php artisan migrate
+```
 
-## Contributing
+6. Seed database (optional)
+```bash
+php artisan db:seed
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+7. Build assets
+```bash
+npm run build
+```
 
-## Code of Conduct
+8. Start development server
+```bash
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Database Structure
 
-## Security Vulnerabilities
+### Main Tables
+- `users` - User accounts with role-based access
+- `school_classes` - Class management
+- `subjects` - Subject management linked to classes
+- `exams` - Exam creation and management
+- `questions` - Question bank
+- `exam_questions` - Pivot table linking exams and questions
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Usage
+
+### Lecturer Account
+1. Login as lecturer
+2. Access lecturer dashboard
+3. Create exams for assigned subjects
+4. Manage exam details and questions
+
+### Student Account
+1. Login as student
+2. View upcoming exams for your class
+3. Access exam details and instructions
+
+## Project Structure
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Auth/
+│   │   ├── DashboardController.php
+│   │   ├── ExamController.php
+│   │   ├── LecturerController.php
+│   │   ├── StudentController.php
+│   │   └── StudentExamController.php
+│   └── Middleware/
+│       ├── LecturerMiddleware.php
+│       └── StudentMiddleware.php
+├── Models/
+│   ├── Exam.php
+│   ├── Question.php
+│   ├── SchoolClass.php
+│   ├── Subject.php
+│   └── User.php
+database/
+└── migrations/
+resources/
+└── views/
+    ├── auth/
+    ├── exams/
+    ├── lecturer/
+    └── student/
+routes/
+└── web.php
+```
+
+## Security
+
+- Role-based middleware protection
+- CSRF protection enabled
+- Password hashing
+- Authorization checks on all sensitive operations
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
