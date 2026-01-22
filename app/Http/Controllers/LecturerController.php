@@ -76,6 +76,20 @@ class LecturerController extends Controller
             ->take(3)
             ->get();
         
+        // Active Exams (currently in progress) - using Kuala Lumpur timezone
+        $now = now()->setTimezone('Asia/Kuala_Lumpur');
+        $activeExamsList = Exam::where('created_by', $user->id)
+            ->where('status', Exam::STATUS_PUBLISHED)
+            ->with(['subject', 'attempts'])
+            ->get()
+            ->filter(function($exam) use ($now) {
+                $startTime = $exam->start_time->setTimezone('Asia/Kuala_Lumpur');
+                $endTime = $exam->end_time->setTimezone('Asia/Kuala_Lumpur');
+                return $startTime <= $now && $endTime >= $now;
+            })
+            ->sortBy('start_time')
+            ->values();
+        
         // Recent Data
         $recentExams = Exam::where('created_by', $user->id)
             ->with('subject')
@@ -96,6 +110,7 @@ class LecturerController extends Controller
             'totalStudents',
             'totalExams', 
             'activeExams',
+            'activeExamsList',
             'draftExams',
             'upcomingExams',
             'totalQuestions',

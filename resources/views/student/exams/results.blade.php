@@ -29,12 +29,40 @@
             <!-- Score Summary -->
             <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-8 mb-6 text-center">
                 <div class="mb-4">
-                    <p class="text-sm text-gray-600 mb-2">Your Score</p>
+                    <p class="text-sm text-gray-600 mb-2">Final Score</p>
                     <p class="text-5xl font-bold text-indigo-600 mb-2">
                         {{ $attempt->total_score }} / {{ $attempt->total_marks }}
                     </p>
                     <div class="inline-flex items-center px-4 py-2 rounded-full {{ $attempt->percentage >= 70 ? 'bg-green-100 text-green-800' : ($attempt->percentage >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
                         <span class="text-lg font-semibold">{{ number_format($attempt->percentage, 1) }}%</span>
+                    </div>
+                </div>
+                
+                @php
+                    $correctCount = 0;
+                    $incorrectCount = 0;
+                    foreach($exam->questions as $question) {
+                        if(isset($answers[$question->id])) {
+                            $answer = $answers[$question->id];
+                            if($question->question_type === 'multiple_choice' || $question->question_type === 'true_false') {
+                                if($answer == $question->correct_answer) {
+                                    $correctCount++;
+                                } else {
+                                    $incorrectCount++;
+                                }
+                            }
+                        }
+                    }
+                @endphp
+                
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div class="bg-white rounded-lg p-4 border-2 border-green-200">
+                        <p class="text-sm text-gray-600 mb-1">Total Correct</p>
+                        <p class="text-3xl font-bold text-green-600">{{ $correctCount }}</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 border-2 border-red-200">
+                        <p class="text-sm text-gray-600 mb-1">Total Incorrect</p>
+                        <p class="text-3xl font-bold text-red-600">{{ $incorrectCount }}</p>
                     </div>
                 </div>
                 
@@ -74,18 +102,20 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-                <a href="{{ route('student.exams.index') }}" 
-                   class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            <div class="flex items-center justify-center gap-4 pt-6 border-t border-gray-200">
+                <a href="{{ route('student.dashboard') }}" 
+                   style="background: linear-gradient(to right, #4f46e5, #6366f1);"
+                   class="inline-flex items-center px-10 py-4 text-white font-bold rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
-                    Back to Exams
+                    Return to Dashboard
                 </a>
                 <a href="{{ route('student.exams.detailed-results', $exam) }}" 
-                   class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+                   style="background: linear-gradient(to right, #6366f1, #818cf8);"
+                   class="inline-flex items-center px-10 py-4 text-white font-bold rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                     View Detailed Results
-                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                 </a>

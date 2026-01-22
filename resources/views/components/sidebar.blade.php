@@ -90,18 +90,18 @@
             <!-- Logo Header -->
             <div class="flex items-center h-16 px-6 border-b border-gray-200 flex-shrink-0">
                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="Yayasan Peneraju" class="h-6 w-auto object-contain">
+                    <img src="{{ asset('images/logo.png') }}" alt="Yayasan Peneraju" class="h-6 w-auto object-contain">
                     <span class="text-base font-bold text-gray-800">Exam Portal</span>
                 </a>
             </div>
 
             <!-- Navigation Menu -->
-            <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+            <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
                 @foreach($menuItems as $item)
                     @if(isset($item['submenu']))
                         <div>
                             <button @click="openSubmenu = openSubmenu === '{{ $item['name'] }}' ? null : '{{ $item['name'] }}'"
-                                    class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {{ $item['active'] ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' : 'text-gray-700 hover:bg-gray-100' }}">
+                                    class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-full transition-colors duration-200 {{ $item['active'] ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-700 hover:bg-gray-100' }}">
                                 <div class="flex items-center space-x-3">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         @if($item['icon'] === 'document-text')
@@ -118,10 +118,10 @@
                             </button>
                             <div x-show="openSubmenu === '{{ $item['name'] }}'" 
                                  x-transition
-                                 class="mt-2 ml-8 space-y-1">
+                                 class="mt-1 ml-8 space-y-1">
                                 @foreach($item['submenu'] as $subitem)
                                     <a href="{{ route($subitem['route']) }}"
-                                       class="block px-4 py-2 text-sm rounded-lg transition-colors duration-200 {{ $subitem['active'] ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-gray-600 hover:bg-gray-100' }}">
+                                       class="block px-4 py-2 text-sm rounded-full transition-colors duration-200 {{ $subitem['active'] ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">
                                         {{ $subitem['name'] }}
                                     </a>
                                 @endforeach
@@ -129,7 +129,7 @@
                         </div>
                     @else
                         <a href="{{ route($item['route']) }}"
-                           class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 {{ $item['active'] ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' : 'text-gray-700 hover:bg-gray-100' }}">
+                           class="flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-full transition-colors duration-200 {{ $item['active'] ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-gray-700 hover:bg-gray-100' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 @if($item['icon'] === 'home')
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
@@ -169,15 +169,30 @@
         <!-- Top Header -->
         <header class="bg-white shadow-sm border-b border-gray-200 flex-shrink-0 h-16">
             <div class="flex items-center justify-between h-full px-4 lg:px-6">
-                <!-- Page Title -->
-                <div class="flex-1 lg:ml-0">
-                    <h1 class="text-xl font-semibold text-gray-800">
-                        @yield('page-title', 'Dashboard')
-                    </h1>
+                <!-- Breadcrumb and Page Title -->
+                <div class="flex-1 lg:ml-0 flex flex-col justify-center">
+                    <nav class="flex items-center space-x-2 text-sm text-gray-500">
+                        <a href="{{ route('dashboard') }}" class="hover:text-gray-700">Home</a>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                        <span class="text-gray-900 font-medium">@yield('page-title', 'Dashboard')</span>
+                    </nav>
                 </div>
 
-                <!-- User Menu -->
-                @include('partials.user-menu')
+                <!-- Right Side Actions -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notification Bell -->
+                    <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+
+                    <!-- User Menu -->
+                    @include('partials.user-menu')
+                </div>
             </div>
         </header>
 
@@ -191,8 +206,8 @@
         @endif
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-gray-50" style="min-height: 0; height: 0;">
-            <div class="max-w-7xl mx-auto px-4 py-6 lg:px-6">
+        <main class="flex-1 overflow-y-auto bg-slate-50" style="min-height: 0; height: 0;">
+            <div class="max-w-screen-2xl mx-auto p-8">
                 @if (session('success'))
                     <div class="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
                         {{ session('success') }}

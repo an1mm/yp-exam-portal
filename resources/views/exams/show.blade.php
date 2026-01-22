@@ -71,11 +71,11 @@
                 </div>
                 <div>
                     <label class="text-sm font-medium text-gray-500">Start Time</label>
-                    <p class="text-gray-900 font-semibold mt-1">{{ $exam->start_time->format('d M Y, H:i') }}</p>
+                    <p class="text-gray-900 font-semibold mt-1">{{ $exam->start_time->setTimezone('Asia/Kuala_Lumpur')->format('d M Y, H:i') }} (Kuala Lumpur)</p>
                 </div>
                 <div>
                     <label class="text-sm font-medium text-gray-500">End Time</label>
-                    <p class="text-gray-900 font-semibold mt-1">{{ $exam->end_time->format('d M Y, H:i') }}</p>
+                    <p class="text-gray-900 font-semibold mt-1">{{ $exam->end_time->setTimezone('Asia/Kuala_Lumpur')->format('d M Y, H:i') }} (Kuala Lumpur)</p>
                 </div>
                 <div>
                     <label class="text-sm font-medium text-gray-500">Status</label>

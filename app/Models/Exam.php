@@ -75,10 +75,13 @@ class Exam extends Model
      */
     public function isActive(): bool
     {
-        $now = now();
+        $now = now()->setTimezone('Asia/Kuala_Lumpur');
+        $startTime = $this->start_time->setTimezone('Asia/Kuala_Lumpur');
+        $endTime = $this->end_time->setTimezone('Asia/Kuala_Lumpur');
+        
         return $this->status === self::STATUS_PUBLISHED &&
-               $this->start_time <= $now && 
-               $this->end_time >= $now;
+               $startTime <= $now && 
+               $endTime >= $now;
     }
 
     /**
@@ -86,7 +89,9 @@ class Exam extends Model
      */
     public function hasEnded(): bool
     {
-        return now() > $this->end_time;
+        $now = now()->setTimezone('Asia/Kuala_Lumpur');
+        $endTime = $this->end_time->setTimezone('Asia/Kuala_Lumpur');
+        return $now > $endTime;
     }
 
     /**
@@ -94,7 +99,9 @@ class Exam extends Model
      */
     public function hasStarted(): bool
     {
-        return now() >= $this->start_time;
+        $now = now()->setTimezone('Asia/Kuala_Lumpur');
+        $startTime = $this->start_time->setTimezone('Asia/Kuala_Lumpur');
+        return $now >= $startTime;
     }
 
     /**
@@ -106,7 +113,9 @@ class Exam extends Model
             return 0;
         }
         
-        return now()->diffInMinutes($this->end_time, false);
+        $now = now()->setTimezone('Asia/Kuala_Lumpur');
+        $endTime = $this->end_time->setTimezone('Asia/Kuala_Lumpur');
+        return $now->diffInMinutes($endTime, false);
     }
 
     /**

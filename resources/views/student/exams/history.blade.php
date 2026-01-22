@@ -55,12 +55,14 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 @if($attempt->status === 'submitted' || $attempt->status === 'graded')
                                     <a href="{{ route('student.exams.results', $attempt->exam) }}" 
-                                       class="text-indigo-600 hover:text-indigo-900 font-medium">
+                                       style="background: linear-gradient(to right, #4f46e5, #6366f1);"
+                                       class="inline-flex items-center px-4 py-2 text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg">
                                         View Results
                                     </a>
                                 @elseif($attempt->status === 'in_progress')
                                     <a href="{{ route('student.exams.take', $attempt->exam) }}" 
-                                       class="text-indigo-600 hover:text-indigo-900 font-medium">
+                                       style="background: linear-gradient(to right, #16a34a, #22c55e);"
+                                       class="inline-flex items-center px-4 py-2 text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg">
                                         Continue
                                     </a>
                                 @endif
@@ -83,7 +85,8 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-2">No Exam History</h3>
             <p class="text-gray-500 text-sm mb-4">You haven't attempted any exams yet.</p>
             <a href="{{ route('student.exams.index') }}" 
-               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+               style="background: linear-gradient(to right, #4f46e5, #6366f1);"
+               class="inline-flex items-center px-10 py-4 text-white font-bold rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                 Browse Available Exams
             </a>
         </div>

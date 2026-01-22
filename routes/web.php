@@ -12,7 +12,7 @@ use App\Http\Controllers\SchoolClassController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 require __DIR__.'/auth.php';
@@ -90,7 +90,10 @@ Route::prefix('student')
         Route::get('/exams/history', [StudentExamController::class, 'history'])->name('exams.history');
         Route::get('/exams/{exam}', [StudentExamController::class, 'show'])->name('exams.show');
         Route::post('/exams/{exam}/start', [StudentExamController::class, 'start'])->name('exams.start');
+        Route::post('/exams/{exam}/start-timer', [StudentExamController::class, 'startTimer'])->name('exams.start-timer');
         Route::get('/exams/{exam}/take', [StudentExamController::class, 'take'])->name('exams.take');
+        Route::post('/exams/{exam}/save-answer', [StudentExamController::class, 'saveAnswer'])->name('exams.save-answer');
+        Route::get('/exams/{exam}/review', [StudentExamController::class, 'review'])->name('exams.review');
         Route::post('/exams/{exam}/submit', [StudentExamController::class, 'submit'])->name('exams.submit');
         Route::get('/exams/{exam}/results', [StudentExamController::class, 'results'])->name('exams.results');
         Route::get('/exams/{exam}/detailed-results', [StudentExamController::class, 'detailedResults'])->name('exams.detailed-results');

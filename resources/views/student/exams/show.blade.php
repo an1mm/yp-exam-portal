@@ -41,11 +41,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                     <label class="text-sm font-medium text-gray-500">Start Time</label>
-                    <p class="text-gray-900 font-semibold mt-1">{{ $exam->start_time->format('d M Y, H:i') }}</p>
+                    <p class="text-gray-900 font-semibold mt-1">{{ $exam->start_time->setTimezone('Asia/Kuala_Lumpur')->format('d M Y, H:i') }} (Kuala Lumpur)</p>
                 </div>
                 <div>
                     <label class="text-sm font-medium text-gray-500">End Time</label>
-                    <p class="text-gray-900 font-semibold mt-1">{{ $exam->end_time->format('d M Y, H:i') }}</p>
+                    <p class="text-gray-900 font-semibold mt-1">{{ $exam->end_time->setTimezone('Asia/Kuala_Lumpur')->format('d M Y, H:i') }} (Kuala Lumpur)</p>
                 </div>
                 <div>
                     <label class="text-sm font-medium text-gray-500">Duration</label>
@@ -64,74 +64,99 @@
             </div>
             @endif
 
-            @if($existingAttempt)
-                @if($existingAttempt->status === 'submitted' || $existingAttempt->status === 'graded')
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                        <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <h3 class="text-lg font-semibold text-blue-900 mb-2">Exam Submitted</h3>
-                        <p class="text-blue-700 mb-4">You have already submitted this exam.</p>
-                        <div class="text-sm text-blue-600 mb-4">
-                            <p>Score: <span class="font-semibold">{{ $existingAttempt->total_score }} / {{ $existingAttempt->total_marks }}</span></p>
-                            <p>Percentage: <span class="font-semibold">{{ number_format($existingAttempt->percentage, 1) }}%</span></p>
-                            <p class="mt-2">Submitted at: {{ $existingAttempt->submitted_at->format('d M Y, H:i') }}</p>
-                        </div>
-                        <a href="{{ route('student.exams.results', $exam) }}" 
-                           class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200">
-                            View Results
-                        </a>
+            @php
+                // Use Kuala Lumpur timezone for all comparisons
+                $now = now()->setTimezone('Asia/Kuala_Lumpur');
+                $startTime = $exam->start_time->setTimezone('Asia/Kuala_Lumpur');
+                $endTime = $exam->end_time->setTimezone('Asia/Kuala_Lumpur');
+                $isActive = $exam->status === 'published' && $startTime <= $now && $endTime >= $now;
+                $hasStarted = $startTime <= $now;
+                $hasEnded = $endTime < $now;
+            @endphp
+
+            @php
+                $canTakeExam = $exam->status === 'published' && $startTime <= $now && $endTime >= $now;
+                $hasInProgressAttempt = $existingAttempt && $existingAttempt->status === 'in_progress';
+                $hasSubmittedAttempt = $existingAttempt && ($existingAttempt->status === 'submitted' || $existingAttempt->status === 'graded');
+            @endphp
+
+            @if($hasSubmittedAttempt)
+                <!-- Exam Already Submitted - Show Results Only -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center mb-6">
+                    <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">Exam Submitted</h3>
+                    <p class="text-blue-700 mb-4">You have already submitted this exam. You cannot retake it.</p>
+                    <div class="text-sm text-blue-600 mb-4">
+                        <p>Score: <span class="font-semibold">{{ $existingAttempt->total_score }} / {{ $existingAttempt->total_marks }}</span></p>
+                        <p>Percentage: <span class="font-semibold">{{ number_format($existingAttempt->percentage, 1) }}%</span></p>
+                        <p class="mt-2">Submitted at: {{ $existingAttempt->submitted_at->setTimezone('Asia/Kuala_Lumpur')->format('d M Y, H:i') }}</p>
                     </div>
-                @else
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-                        <h3 class="text-lg font-semibold text-yellow-900 mb-2">Exam In Progress</h3>
-                        <p class="text-yellow-700 mb-4">You have an ongoing attempt for this exam.</p>
-                        <a href="{{ route('student.exams.take', $exam) }}" 
-                           class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200">
-                            Continue Exam
-                        </a>
-                    </div>
-                @endif
-            @elseif(now() >= $exam->start_time && now() <= $exam->end_time)
-                @if($exam->isActive())
+                    <a href="{{ route('student.exams.results', $exam) }}" 
+                       style="background: linear-gradient(to right, #4f46e5, #6366f1);"
+                       class="inline-flex items-center px-10 py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        View Results
+                    </a>
+                </div>
+            @elseif($hasInProgressAttempt)
+                <!-- Exam In Progress - Show Continue Button Only -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center mb-6">
+                    <h3 class="text-lg font-semibold text-yellow-900 mb-2">Exam In Progress</h3>
+                    <p class="text-yellow-700 mb-4">You have an ongoing attempt for this exam.</p>
+                    <a href="{{ route('student.exams.take', $exam) }}" 
+                       style="background: linear-gradient(to right, #4f46e5, #6366f1);"
+                       class="inline-flex items-center px-10 py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        Continue Taking Exam
+                    </a>
+                </div>
+            @elseif($canTakeExam)
+                <!-- No Attempt Yet - Show Start Button Only -->
+                <div class="mb-6">
                     <form action="{{ route('student.exams.start', $exam) }}" method="POST">
                         @csrf
-                        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-6 text-center">
-                            <h3 class="text-lg font-semibold text-indigo-900 mb-2">Ready to Start?</h3>
-                            <p class="text-indigo-700 mb-4">You will have {{ $exam->duration_minutes }} minutes to complete this exam.</p>
+                        <div class="text-center">
                             <button type="submit" 
-                                    class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200">
-                                Start Exam
+                                    style="background: linear-gradient(to right, #16a34a, #22c55e);"
+                                    class="px-10 py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                Start Taking Exam
                             </button>
                         </div>
                     </form>
-                @else
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-                        <p class="text-gray-700">This exam is not currently active.</p>
-                    </div>
-                @endif
-            @elseif(now() < $exam->start_time)
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                    <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <h3 class="text-lg font-semibold text-blue-900 mb-2">Exam Not Available Yet</h3>
-                    <p class="text-blue-700">This exam will be available on {{ $exam->start_time->format('d M Y, H:i') }}</p>
                 </div>
             @else
-                <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-                    <svg class="w-12 h-12 text-red-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    <h3 class="text-lg font-semibold text-red-900 mb-2">Exam Has Ended</h3>
-                    <p class="text-red-700">This exam ended on {{ $exam->end_time->format('d M Y, H:i') }}</p>
+                <!-- Exam Not Available - Show Disabled Button with Warning -->
+                <div class="mb-6">
+                    <form action="{{ route('student.exams.start', $exam) }}" method="POST">
+                        @csrf
+                        <div class="text-center">
+                            @if(!$hasStarted)
+                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                    <p class="text-yellow-800 font-semibold mb-2">⚠️ Exam Not Available Yet</p>
+                                    <p class="text-yellow-700 text-sm">You can take this exam starting from <strong>{{ $startTime->format('d M Y, H:i') }} (Kuala Lumpur)</strong></p>
+                                    <p class="text-yellow-600 text-xs mt-1">Current Time: {{ $now->format('d M Y, H:i:s') }}</p>
+                                </div>
+                            @elseif($hasEnded)
+                                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                                    <p class="text-red-800 font-semibold mb-2">❌ Exam Has Ended</p>
+                                    <p class="text-red-700 text-sm">This exam ended on <strong>{{ $endTime->format('d M Y, H:i') }} (Kuala Lumpur)</strong></p>
+                                </div>
+                            @endif
+                            <button type="submit" 
+                                    disabled
+                                    style="background: linear-gradient(to right, #9ca3af, #6b7280);"
+                                    class="px-10 py-4 text-white font-bold text-lg rounded-xl cursor-not-allowed opacity-50 transition-all duration-200 shadow-lg">
+                                Start Taking Exam
+                            </button>
+                        </div>
+                    </form>
                 </div>
             @endif
 
-            <div class="mt-6">
+            <div class="mt-6 text-center">
                 <a href="{{ route('student.exams.index') }}" 
-                   class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
                     Back to Exams

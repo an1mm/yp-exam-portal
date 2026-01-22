@@ -45,6 +45,15 @@ class ExamController extends Controller
             return back()->withErrors(['subject_id' => 'You can only create exams for your own subjects.']);
         }
 
+        // Convert datetime from Kuala Lumpur timezone to UTC for storage
+        // datetime-local input is treated as Kuala Lumpur time
+        $validated['start_time'] = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['start_time'], 'Asia/Kuala_Lumpur')
+            ->setTimezone('UTC')
+            ->format('Y-m-d H:i:s');
+        $validated['end_time'] = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['end_time'], 'Asia/Kuala_Lumpur')
+            ->setTimezone('UTC')
+            ->format('Y-m-d H:i:s');
+
         $validated['created_by'] = auth()->id();
         $validated['status'] = Exam::STATUS_DRAFT;
 
@@ -178,6 +187,15 @@ class ExamController extends Controller
         if ($subject->lecturer_id !== auth()->id()) {
             return back()->withErrors(['subject_id' => 'You can only assign exams to your own subjects.']);
         }
+
+        // Convert datetime from Kuala Lumpur timezone to UTC for storage
+        // datetime-local input is treated as Kuala Lumpur time
+        $validated['start_time'] = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['start_time'], 'Asia/Kuala_Lumpur')
+            ->setTimezone('UTC')
+            ->format('Y-m-d H:i:s');
+        $validated['end_time'] = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['end_time'], 'Asia/Kuala_Lumpur')
+            ->setTimezone('UTC')
+            ->format('Y-m-d H:i:s');
 
         $exam->update($validated);
 
