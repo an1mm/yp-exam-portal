@@ -214,7 +214,3 @@ routes/
 - CSRF protection enabled
 - Password hashing
 - Authorization checks on all sensitive operations
-
-## License
-
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
