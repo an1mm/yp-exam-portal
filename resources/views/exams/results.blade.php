@@ -135,6 +135,56 @@
             </div>
         @endif
     </div>
+
+    <!-- Students Who Haven't Attempted -->
+    @if(isset($studentsNotAttempted) && $studentsNotAttempted->count() > 0)
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    @if(isset($examHasEnded) && $examHasEnded)
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">Students Who Missed This Exam</h3>
+                    @else
+                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">Students Who Haven't Attempted</h3>
+                    @endif
+                </div>
+                <span class="px-3 py-1 text-sm font-semibold {{ isset($examHasEnded) && $examHasEnded ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800' }} rounded-full">{{ $studentsNotAttempted->count() }}</span>
+            </div>
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($studentsNotAttempted as $student)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $student->name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $student->email }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $student->schoolClass->name ?? 'N/A' }}
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 <!-- Attempt Details Modal -->
@@ -162,29 +212,7 @@
 
 @push('scripts')
 <script>
-const attemptsData = @json($attempts->map(function($attempt) {
-    return [
-        'id' => $attempt->id,
-        'student_name' => $attempt->student->name,
-        'student_email' => $attempt->student->email,
-        'total_score' => $attempt->total_score,
-        'total_marks' => $attempt->total_marks,
-        'percentage' => number_format($attempt->percentage, 1),
-        'status' => $attempt->status,
-        'submitted_at' => $attempt->submitted_at ? $attempt->submitted_at->format('d M Y, H:i') : null,
-        'answers' => $attempt->answers->map(function($answer) {
-            return [
-                'question_text' => $answer->question->question_text,
-                'question_type' => $answer->question->question_type,
-                'answer' => $answer->answer,
-                'marks_obtained' => $answer->marks_obtained,
-                'question_marks' => $answer->question->pivot->marks ?? $answer->question->marks,
-                'correct_answer' => $answer->question->correct_answer,
-                'options' => $answer->question->options,
-            ];
-        })
-    ];
-}));
+const attemptsData = @json($attemptsData);
 
 function viewAttemptDetails(attemptId) {
     const attempt = attemptsData.find(a => a.id === attemptId);

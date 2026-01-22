@@ -81,23 +81,73 @@ php artisan db:seed
 ```
 
 **What the seeder creates:**
-- **3 School Classes**: CS101, CS201, IT101
-- **1 Lecturer Account**: lecturer@test.com / password
-- **3 Student Accounts**: 
-  - student1@test.com / password (CS101)
-  - student2@test.com / password (CS101)
-  - student3@test.com / password (IT101)
-- **4 Subjects**: 
-  - Web Development (WEB101) - CS101
-  - Database Systems (DB101) - CS101
-  - System Analysis and Design (SAD201) - CS201
-  - Programming Fundamentals (PROG101) - IT101
-- **Sample Exams**: Multiple exams with various question types (Multiple Choice, True/False, Short Answer, Essay)
+
+**School Classes (3):**
+- CS101 - Computer Science Year 1
+- CS201 - Computer Science Year 2
+- IT101 - Information Technology Year 1
+
+**User Accounts:**
+- **Lecturer**: lecturer@test.com / password
+- **Students**:
+  - student1@test.com / password (assigned to CS101)
+  - student2@test.com / password (assigned to CS101)
+  - student3@test.com / password (assigned to IT101)
+
+**Subjects (4):**
+- Web Development (WEB101) - assigned to CS101
+- Database Systems (DB101) - assigned to CS101
+- System Analysis and Design (SAD201) - assigned to CS201
+- Programming Fundamentals (PROG101) - assigned to IT101
+
+**Sample Exams with Questions:**
+
+1. **Web Development Midterm Exam** (WEB101)
+   - Duration: 60 minutes
+   - Start: Tomorrow 9:00 AM
+   - End: Tomorrow 10:00 AM
+   - Questions (4):
+     - Multiple Choice: "What does HTML stand for?" (5 marks)
+     - Multiple Choice: "Which CSS property is used to change the text color?" (5 marks)
+     - True/False: "JavaScript is a compiled language." (5 marks)
+     - Short Answer: "Explain the difference between let, const, and var in JavaScript." (10 marks)
+   - Total Marks: 25
+
+2. **Database Systems Quiz** (DB101)
+   - Duration: 30 minutes
+   - Start: Day after tomorrow 2:00 PM
+   - End: Day after tomorrow 2:30 PM
+   - Questions (3):
+     - Multiple Choice: "What does SQL stand for?" (5 marks)
+     - Multiple Choice: "Which SQL command is used to retrieve data?" (5 marks)
+     - True/False: "A primary key can have NULL values." (5 marks)
+   - Total Marks: 15
+
+3. **Programming Fundamentals Test** (PROG101)
+   - Duration: 45 minutes
+   - Start: 2 hours from now
+   - End: 2 hours 45 minutes from now
+   - Questions (3):
+     - Multiple Choice: "What is the output of: print(2 + 3 * 4)?" (5 marks)
+     - True/False: "A variable can store multiple values of different types." (5 marks)
+     - Short Answer: "Explain what a loop is in programming." (10 marks)
+   - Total Marks: 20
+
+4. **System Analysis and Design Assignment** (SAD201)
+   - Duration: 90 minutes
+   - Start: 3 days from now 10:00 AM
+   - End: 3 days from now 11:30 AM
+   - Questions (2):
+     - Multiple Choice: "What does UML stand for?" (5 marks)
+     - Essay: "Describe the purpose of a use case diagram in system analysis." (15 marks)
+   - Total Marks: 20
 
 **Note**: All sample data is generated through Laravel seeders. This ensures:
-- Consistent test data for all developers
-- No sensitive data in the repository
-- Easy reset: `php artisan migrate:fresh --seed` to start fresh
+- ✅ Consistent test data for all developers
+- ✅ No sensitive data in the repository
+- ✅ Easy reset: `php artisan migrate:fresh --seed` to start fresh
+- ✅ All exams are automatically published and ready for testing
+- ✅ Questions are automatically attached to their respective exams
 
 7. Build assets
 ```bash

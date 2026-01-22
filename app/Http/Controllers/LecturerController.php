@@ -80,14 +80,60 @@ class LecturerController extends Controller
         $now = now()->setTimezone('Asia/Kuala_Lumpur');
         $activeExamsList = Exam::where('created_by', $user->id)
             ->where('status', Exam::STATUS_PUBLISHED)
-            ->with(['subject', 'attempts'])
+            ->with(['subject.classes', 'attempts.student'])
             ->get()
             ->filter(function($exam) use ($now) {
                 $startTime = $exam->start_time->setTimezone('Asia/Kuala_Lumpur');
                 $endTime = $exam->end_time->setTimezone('Asia/Kuala_Lumpur');
                 return $startTime <= $now && $endTime >= $now;
             })
+            ->map(function($exam) {
+                // Get students who haven't attempted
+                $classIds = $exam->subject->classes->pluck('id');
+                $attemptedStudentIds = $exam->attempts->pluck('student_id');
+                
+                $studentsNotAttempted = \App\Models\User::whereIn('class_id', $classIds)
+                    ->where('role', 'student')
+                    ->whereNotIn('id', $attemptedStudentIds)
+                    ->with('schoolClass')
+                    ->orderBy('name')
+                    ->get();
+                
+                $exam->students_not_attempted = $studentsNotAttempted;
+                return $exam;
+            })
             ->sortBy('start_time')
+            ->values();
+        
+        // Missed Exams (ended but students haven't attempted) - using Kuala Lumpur timezone
+        $missedExamsList = Exam::where('created_by', $user->id)
+            ->where('status', Exam::STATUS_PUBLISHED)
+            ->with(['subject.classes', 'attempts.student'])
+            ->get()
+            ->filter(function($exam) use ($now) {
+                $endTime = $exam->end_time->setTimezone('Asia/Kuala_Lumpur');
+                return $endTime < $now; // Exam has ended
+            })
+            ->map(function($exam) {
+                // Get students who missed the exam (didn't attempt)
+                $classIds = $exam->subject->classes->pluck('id');
+                $attemptedStudentIds = $exam->attempts->pluck('student_id');
+                
+                $studentsMissed = \App\Models\User::whereIn('class_id', $classIds)
+                    ->where('role', 'student')
+                    ->whereNotIn('id', $attemptedStudentIds)
+                    ->with('schoolClass')
+                    ->orderBy('name')
+                    ->get();
+                
+                $exam->students_missed = $studentsMissed;
+                return $exam;
+            })
+            ->filter(function($exam) {
+                return $exam->students_missed->count() > 0; // Only show exams with missed students
+            })
+            ->sortByDesc('end_time')
+            ->take(5)
             ->values();
         
         // Recent Data
@@ -111,6 +157,7 @@ class LecturerController extends Controller
             'totalExams', 
             'activeExams',
             'activeExamsList',
+            'missedExamsList',
             'draftExams',
             'upcomingExams',
             'totalQuestions',

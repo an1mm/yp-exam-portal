@@ -283,7 +283,49 @@ class ExamController extends Controller
             'lowest_score' => $attempts->where('status', '!=', 'in_progress')->min('total_score') ?? 0,
         ];
 
-        return view('exams.results', compact('exam', 'attempts', 'stats'));
+        // Prepare attempts data for JavaScript
+        $attemptsData = $attempts->map(function($attempt) {
+            return [
+                'id' => $attempt->id,
+                'student_name' => $attempt->student->name,
+                'student_email' => $attempt->student->email,
+                'total_score' => $attempt->total_score,
+                'total_marks' => $attempt->total_marks,
+                'percentage' => number_format($attempt->percentage, 1),
+                'status' => $attempt->status,
+                'submitted_at' => $attempt->submitted_at ? $attempt->submitted_at->format('d M Y, H:i') : null,
+                'answers' => $attempt->answers->map(function($answer) {
+                    return [
+                        'question_text' => $answer->question->question_text,
+                        'question_type' => $answer->question->question_type,
+                        'answer' => $answer->answer,
+                        'marks_obtained' => $answer->marks_obtained,
+                        'question_marks' => $answer->question->pivot->marks ?? $answer->question->marks,
+                        'correct_answer' => $answer->question->correct_answer,
+                        'options' => $answer->question->options,
+                    ];
+                })->toArray()
+            ];
+        })->toArray();
+
+        // Get students who haven't attempted the exam
+        $exam->load('subject.classes');
+        $classIds = $exam->subject->classes->pluck('id');
+        $attemptedStudentIds = $attempts->pluck('student_id');
+        
+        $studentsNotAttempted = \App\Models\User::whereIn('class_id', $classIds)
+            ->where('role', 'student')
+            ->whereNotIn('id', $attemptedStudentIds)
+            ->with('schoolClass')
+            ->orderBy('name')
+            ->get();
+
+        // Check if exam has ended
+        $now = now()->setTimezone('Asia/Kuala_Lumpur');
+        $examEndTime = $exam->end_time->setTimezone('Asia/Kuala_Lumpur');
+        $examHasEnded = $now > $examEndTime;
+
+        return view('exams.results', compact('exam', 'attempts', 'stats', 'attemptsData', 'studentsNotAttempted', 'examHasEnded'));
     }
 
     public function gradeAnswer(Request $request, Exam $exam, ExamAttempt $attempt, ExamAnswer $answer)
